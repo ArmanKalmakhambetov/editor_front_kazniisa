@@ -1,342 +1,342 @@
-import * as React from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import {Button, TextField} from '@mui/material';
-import {useState, useEffect} from 'react';
-import {useRouter} from 'next/navigation';
-import {useDispatch, useSelector} from 'react-redux';
-import {loginInspectorAction, sendMail} from '@/store/slices/authSlice';
-import {sendCodeToEmailAction, verifyCodeAction} from '@/store/slices/authSlice';
+import * as React from "react";
+import CssBaseline from "@mui/material/CssBaseline";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import { Button, TextField } from "@mui/material";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { loginInspectorAction, sendMail } from "@/store/slices/authSlice";
 import {
-    Form,
-    Row,
-    Col,
-    Label,
-    Input,
-    FormGroup
-} from 'reactstrap';
-import { loginAction } from '@/store/slices/authSlice';
+  sendCodeToEmailAction,
+  verifyCodeAction,
+} from "@/store/slices/authSlice";
+import { Form, Row, Col, Label, Input, FormGroup } from "reactstrap";
+import { loginAction } from "@/store/slices/authSlice";
 export default function Login() {
-    const dispatch = useDispatch()
-    const [isWaiting, setIsWaiting] = useState(false);
-    const router = useRouter();
-    const initialTime = 30; // Начальное время в секундах
-    const [time, setTime] = useState(initialTime);
-    const [isInputEnabled, setInputEnabled] = useState(true);
-    const [isWrongCode, setIsWrongCode] = useState(false);
-    const [code, setCode] = useState('');
-    const [step, setStep] = useState(1)
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const someVar = useSelector((state) => state.auth.someVar);
-    const token = useSelector((state) => state.auth.authToken);
-    // const currentUser=useSelector((state)=>{state.auth.currentUser})
-    // console.log('somevar',someVar,'authToken=',token)
+  const dispatch = useDispatch();
+  const [isWaiting, setIsWaiting] = useState(false);
+  const router = useRouter();
+  const initialTime = 30; // Начальное время в секундах
+  const [time, setTime] = useState(initialTime);
+  const [isInputEnabled, setInputEnabled] = useState(true);
+  const [isWrongCode, setIsWrongCode] = useState(false);
+  const [code, setCode] = useState("");
+  const [step, setStep] = useState(1);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const someVar = useSelector((state) => state.auth.someVar);
+  const token = useSelector((state) => state.auth.authToken);
+  // const currentUser=useSelector((state)=>{state.auth.currentUser})
+  // console.log('somevar',someVar,'authToken=',token)
 
-    
-    useEffect(() => {
-        
-        const timer = setInterval(() => {
-            if (time > 0) {
-                setTime(time - 1);
-            } else {
-                clearInterval(timer);
-                setIsWrongCode(false); // Сбросить состояние неверного кода после окончания отсчета
-                setInputEnabled(true); // Разрешить ввод после окончания отсчета
-            }
-        }, 1000);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (time > 0) {
+        setTime(time - 1);
+      } else {
+        clearInterval(timer);
+        setIsWrongCode(false); // Сбросить состояние неверного кода после окончания отсчета
+        setInputEnabled(true); // Разрешить ввод после окончания отсчета
+      }
+    }, 1000);
 
-        // Очистите таймер при размонтировании компонента
-        return() => {
-            clearInterval(timer);
-        };
-    }, [time]);
-
-    // Форматирование времени в минуты и секунды
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-
-    const handleInputChange = (event) => {
-        setCode(event.target.value);
-
-        if (!isWaiting && isWrongCode) {
-            setInputEnabled(true); // Разрешить ввод после ожидания 10 секунд
-            setIsWrongCode(false);
-        }
+    // Очистите таймер при размонтировании компонента
+    return () => {
+      clearInterval(timer);
     };
+  }, [time]);
 
-    const handleCodeSubmit = () => {
+  // Форматирование времени в минуты и секунды
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
 
-        const lastFour = someVar.slice(-4);
-        console.log('code=', code, 'somevar', lastFour)
+  const handleInputChange = (event) => {
+    setCode(event.target.value);
 
-
-        if (code == lastFour) {
-            setInputEnabled(true); // Разрешить ввод
-            console.log("IM IN LOGIN HANDLE CODE SUBBMIT")
-            dispatch(verifyCodeAction(email, lastFour))
-           
-            router.push('/projects');
-           
-           
-
-        } else {
-            setIsWrongCode(true);
-            setInputEnabled(false);
-            setTime(30); // Блокировать на 3 минуты
-        }
-    };
-
-
-    const validateEmail = (email) => { // Простая проверка формата email с использованием регулярного выражения
-        const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-        return emailPattern.test(email);
-    };
-
-
-    const loginWithEmailAndPassword=async()=>{
-        await dispatch(loginAction(email,password))   
-        // window.location.reload();     
-        router.push('/mainpage');
-       
+    if (!isWaiting && isWrongCode) {
+      setInputEnabled(true); // Разрешить ввод после ожидания 10 секунд
+      setIsWrongCode(false);
     }
+  };
 
-    const loginInspectorWithEmailAndPassword=async()=>{
-        await dispatch(loginInspectorAction(email,password))    
-        // window.location.reload();    
-        router.push('/inspector');
-       
+  const handleCodeSubmit = (e) => {
+    e.preventDefault();
+    const lastFour = someVar.slice(-4);
+    console.log("code=", code, "somevar", lastFour);
+
+    if (code == lastFour) {
+      setInputEnabled(true); // Разрешить ввод
+      console.log("IM IN LOGIN HANDLE CODE SUBBMIT");
+      dispatch(verifyCodeAction(email, lastFour));
+
+      router.push("/projects");
+    } else {
+      setIsWrongCode(true);
+      setInputEnabled(false);
+      setTime(30); // Блокировать на 3 минуты
     }
+  };
 
-    const handleClickEnterWithLoginPassword=async()=>{
-        setStep(3);
-        // if (validateEmail(email)) {
-        //     setStep(3);
-            
+  const validateEmail = (email) => {
+    // Простая проверка формата email с использованием регулярного выражения
+    const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+    return emailPattern.test(email);
+  };
 
-          
+  const loginWithEmailAndPassword = async () => {
+    await dispatch(loginAction(email, password));
+    // window.location.reload();
+    router.push("/mainpage");
+  };
 
-        // } else {
-        //     alert('Пожалуйста, введите действительный адрес электронной почты.');
-        // }
-       
+  const loginInspectorWithEmailAndPassword = async () => {
+    await dispatch(loginInspectorAction(email, password));
+    // window.location.reload();
+    router.push("/inspector");
+  };
+
+  const handleClickEnterWithLoginPassword = async () => {
+    setStep(3);
+    // if (validateEmail(email)) {
+    //     setStep(3);
+
+    // } else {
+    //     alert('Пожалуйста, введите действительный адрес электронной почты.');
+    // }
+  };
+
+  const handleInspectorEnterWithEmailAndPassword = async () => {
+    // if (validateEmail(email)) {
+    setStep(4);
+
+    // } else {
+    //     alert('Пожалуйста, введите действительный адрес электронной почты.');
+    // }
+  };
+
+  const handleClick = async () => {
+    if (validateEmail(email)) {
+      setStep(2);
+      await dispatch(sendCodeToEmailAction(email));
+    } else {
+      alert("Пожалуйста, введите действительный адрес электронной почты.");
     }
+  };
 
-    const handleInspectorEnterWithEmailAndPassword=async()=>{
-        // if (validateEmail(email)) {
-            setStep(4);
-            
+  const handleChangeEmail = (event) => {
+    setEmail(event.target.value);
+  };
 
-          
+  const handleChangePassword = (event) => {
+    setPassword(event.target.value);
+  };
+  return (
+    <>
+      {step === 1 && (
+        <Row
+          style={{
+            height: "98vh",
+            alignItems: "center",
+            width: "100vw",
+          }}
+        >
+          <Col className="" sm="4" xs="6"></Col>
+          <Col sm="4" xs="6">
+            <Form>
+              <Row className="card">
+                <Col>
+                  <Label>Введите свой Email</Label>
+                  <Input
+                    id="outlined-basic"
+                    variant="outlined"
+                    value={email}
+                    onChange={handleChangeEmail}
+                    
+                    type="email"
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+                    // Паттерн для валидации
+                    title="Введите действительный адрес электронной почты"
+                  />
+                  <br />
+                  <Button onClick={handleClick} color="primary">
+                    Продолжить
+                  </Button>
 
-        // } else {
-        //     alert('Пожалуйста, введите действительный адрес электронной почты.');
-        // }
-       
-    }
-
-    const handleClick = async () => {
-
-        if (validateEmail(email)) {
-            setStep(2);
-            await dispatch(sendCodeToEmailAction(email))
-
-        } else {
-            alert('Пожалуйста, введите действительный адрес электронной почты.');
-        }
-
-
-    }
-
-    const handleChangeEmail = (event) => {
-        setEmail(event.target.value);
-    };
-
-    const handleChangePassword = (event) => {
-        setPassword(event.target.value);
-    };
-    return (
-        <>
-
-{  step === 1 &&
-            <Row style={{
-                height: "98vh",
-                alignItems: "center",
-                width: "100vw"
-            }}>
-                <Col className="" sm="4" xs="6"></Col>
-                <Col sm="4" xs="6">
-                    <Form>
-                        <Row className="card">
-                            <Col>
-                                <Label>
-                                    Введите свой Email
-                                </Label>
-                                <Input id="outlined-basic" variant="outlined" 
-                                    value={email}
-                                    onChange={handleChangeEmail}
-                                    type="email"
-                                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
-                                    // Паттерн для валидации
-                                    title="Введите действительный адрес электронной почты"
-                                />
-                                <br/>
-                                <Button onClick={handleClick} color="primary">Продолжить
-
-                                </Button>
-
-                                <Button onClick={handleClickEnterWithLoginPassword} color="primary">Вход
-
-                                </Button>
-                            </Col>
-                        </Row>
-                    </Form>
-
+                  <Button
+                    onClick={handleClickEnterWithLoginPassword}
+                    color="primary"
+                  >
+                    Вход
+                  </Button>
                 </Col>
-                <Col className="" sm="4"></Col>
-            </Row>
-}
+              </Row>
+            </Form>
+          </Col>
+          <Col className="" sm="4"></Col>
+        </Row>
+      )}
 
-
-{  step === 2 &&
-            <Row style={{
-                height: "98vh",
-                alignItems: "center",
-                width: "100vw"
-            }}>
-                <Col className="" sm="4" xs="6"></Col>
-                <Col sm="4" xs="6">
-                    <Form>
-                        <Row className="card">
-                            <Col>
-                            
-                                <Label className="visually-hidden" for="exampleEmail">
-                                  Отправили код на {email}
-                                </Label>
-                                <Label>
-                                    Введите код чтобы подтвердить что это вы, а не кто-то другой
-                                </Label>
-                                <Input id="outlined-basic" variant="outlined" 
-                                     disabled={
-                                      !isInputEnabled
-                                  }
-                                  value={code}
-                                  onChange={handleInputChange}
-                                />
-                                <br/>
-                                {
-                                        isWrongCode && <p>Неверный код. Попробуйте {minutes}:{
-                                            seconds < 10 ? `0${seconds}` : seconds
-                                        }</p>
-                                    }
-                                        <br/>
-                                <Button  disabled={!isInputEnabled} onClick={handleCodeSubmit} color="primary">
-                                      Продолжить
-                                </Button>
-                            </Col>
-                        </Row>
-                    </Form>
-
+      {step === 2 && (
+        <Row
+          style={{
+            height: "98vh",
+            alignItems: "center",
+            width: "100vw",
+          }}
+        >
+          <Col className="" sm="4" xs="6"></Col>
+          <Col sm="4" xs="6">
+            <Form>
+              <Row className="card">
+                <Col>
+                  <Label className="visually-hidden" for="exampleEmail">
+                    Отправили код на {email}
+                  </Label>
+                  <Label>
+                    Введите код чтобы подтвердить что это вы, а не кто-то другой
+                  </Label>
+                  <Input
+                    id="outlined-basic"
+                    variant="outlined"
+                    disabled={!isInputEnabled}
+                    value={code}
+                    onChange={handleInputChange}
+                    onKeyDown={(e) => {
+                        console.log(e.key)
+                        if (e.key === "Enter") {
+                            console.log(e.key);
+                            handleCodeSubmit(e);
+                        }
+                    }}
+                  />
+                  <br />
+                  {isWrongCode && (
+                    <p>
+                      Неверный код. Попробуйте {minutes}:
+                      {seconds < 10 ? `0${seconds}` : seconds}
+                    </p>
+                  )}
+                  <br />
+                  <Button
+                    type="button"
+                    disabled={!isInputEnabled}
+                    onClick={handleCodeSubmit}
+                    color="primary"
+                  >
+                    Продолжить
+                  </Button>
                 </Col>
-                <Col className="" sm="4"></Col>
-            </Row>
-}
+              </Row>
+            </Form>
+          </Col>
+          <Col className="" sm="4"></Col>
+        </Row>
+      )}
 
+      {step === 3 && (
+        <Row
+          style={{
+            height: "98vh",
+            alignItems: "center",
+            width: "100vw",
+          }}
+        >
+          <Col className="" sm="4" xs="6"></Col>
+          <Col sm="4" xs="6">
+            <Form>
+              <Row className="card">
+                <Col>
+                  <Label>Введите email и пароль</Label>
+                  <Input
+                    id="outlined-basic"
+                    variant="outlined"
+                    value={email}
+                    onChange={handleChangeEmail}
+                    type="email"
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+                    // Паттерн для валидации
+                    title="Введите действительный адрес электронной почты"
+                  />
+                  <Input
+                    id="outlined-basic"
+                    variant="outlined"
+                    value={password}
+                    onChange={handleChangePassword}
+                    type="email"
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+                    // Паттерн для валидации
+                    title="Введите действительный пароль"
+                  />
+                  <br />
 
-{  step === 3 &&
-            <Row style={{
-                height: "98vh",
-                alignItems: "center",
-                width: "100vw"
-            }}>
-                <Col className="" sm="4" xs="6"></Col>
-                <Col sm="4" xs="6">
-                    <Form>
-                        <Row className="card">
-                            <Col>
-                                <Label>
-                                    Введите email и пароль
-                                </Label>
-                                <Input id="outlined-basic" variant="outlined" 
-                                    value={email}
-                                    onChange={handleChangeEmail}
-                                    type="email"
-                                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
-                                    // Паттерн для валидации
-                                    title="Введите действительный адрес электронной почты"
-                                />
-                                 <Input id="outlined-basic" variant="outlined" 
-                                    value={password}
-                                    onChange={handleChangePassword}
-                                    type="email"
-                                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
-                                    // Паттерн для валидации
-                                    title="Введите действительный пароль"
-                                />
-                                <br/>
-                               
-
-                                <Button onClick={loginWithEmailAndPassword} color="primary" type='button'>Войти
-
-                                </Button>
-                            </Col>
-                        </Row>
-                    </Form>
-
+                  <Button
+                    onClick={loginWithEmailAndPassword}
+                    color="primary"
+                    type="button"
+                  >
+                    Войти
+                  </Button>
                 </Col>
-                <Col className="" sm="4"></Col>
-            </Row>
-}
+              </Row>
+            </Form>
+          </Col>
+          <Col className="" sm="4"></Col>
+        </Row>
+      )}
 
+      {step === 4 && (
+        <Row
+          style={{
+            height: "98vh",
+            alignItems: "center",
+            width: "100vw",
+          }}
+        >
+          <Col className="" sm="4" xs="6"></Col>
+          <Col sm="4" xs="6">
+            <Form>
+              <Row className="card">
+                <Col>
+                  <Label>Введите email и пароль</Label>
+                  <Input
+                    id="outlined-basic"
+                    variant="outlined"
+                    value={email}
+                    onChange={handleChangeEmail}
+                    type="email"
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+                    // Паттерн для валидации
+                    title="Введите действительный адрес электронной почты"
+                  />
+                  <Input
+                    id="outlined-basic"
+                    variant="outlined"
+                    value={password}
+                    onChange={handleChangePassword}
+                    type="email"
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+                    // Паттерн для валидации
+                    title="Введите действительный пароль"
+                  />
+                  <br />
 
-{  step === 4 &&
-            <Row style={{
-                height: "98vh",
-                alignItems: "center",
-                width: "100vw"
-            }}>
-                <Col className="" sm="4" xs="6"></Col>
-                <Col sm="4" xs="6">
-                    <Form>
-                        <Row className="card">
-                            <Col>
-                                <Label>
-                                    Введите email и пароль
-                                </Label>
-                                <Input id="outlined-basic" variant="outlined" 
-                                    value={email}
-                                    onChange={handleChangeEmail}
-                                    type="email"
-                                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
-                                    // Паттерн для валидации
-                                    title="Введите действительный адрес электронной почты"
-                                />
-                                 <Input id="outlined-basic" variant="outlined" 
-                                    value={password}
-                                    onChange={handleChangePassword}
-                                    type="email"
-                                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
-                                    // Паттерн для валидации
-                                    title="Введите действительный пароль"
-                                />
-                                <br/>
-                               
-
-                                <Button onClick={loginInspectorWithEmailAndPassword} color="primary">Войти
-
-                                </Button>
-                            </Col>
-                        </Row>
-                    </Form>
-
+                  <Button
+                    onClick={loginInspectorWithEmailAndPassword}
+                    color="primary"
+                  >
+                    Войти
+                  </Button>
                 </Col>
-                <Col className="" sm="4"></Col>
-            </Row>
-}
+              </Row>
+            </Form>
+          </Col>
+          <Col className="" sm="4"></Col>
+        </Row>
+      )}
 
-            {/* <main>
+      {/* <main>
 
                 <CssBaseline/> {
                 step === 1 && <Container fixed>
@@ -421,6 +421,6 @@ export default function Login() {
                         </div>
                     </Container>
             } </main> */}
-        </>
-    );
+    </>
+  );
 }
