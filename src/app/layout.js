@@ -8,8 +8,8 @@ import "bootstrap/dist/css/bootstrap.css";
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 export const metadata = {
-  title: "Second Lesson",
-  description: "Learn nextJS and React",
+  title: "Editor js",
+  description: "React KazNIISA Editor js",
 };
 
 export default function RootLayout({ children }) {

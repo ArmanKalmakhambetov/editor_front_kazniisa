@@ -20,6 +20,7 @@ const initialState = {
   uploadProgress: 0,
   allProjects: [],
   allDocuments: [],
+  currentDocument: {},
 };
 // const token = localStorage.getItem('token');
 
@@ -281,6 +282,12 @@ export const authSlice = createSlice({
     createDocumentReducer: (state, action) => {
       state.allDocuments = [...state.allDocuments, action.payload]; //нужен для обновления всех документов в реальном времени
     },
+    getDocumentByIdReducer: (state, action) => {
+      state.currentDocument = action.payload;
+    },
+    updateDocumentContentReducer: (state, action) => {
+      state.currentDocument = [...state.currentDocument, action.payload];
+    }
   },
 });
 
@@ -308,6 +315,8 @@ export const {
   getAllUserProjectsReducer,
   getAllProjectDocumentsReducer,
   createDocumentReducer,
+  getDocumentByIdReducer,
+  updateDocumentContentReducer,
 } = authSlice.actions;
 
 // Use useEffect for token initialization
@@ -773,6 +782,21 @@ export const getAllProjectDocumentsAction = (id) => async (dispatch) => {
     });
 };
 
+export const getDocumentByIdAction = (id) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  const response = await axios
+    .get(`${END_POINT}/api/user/project/document/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json", // Set the content type to JSON
+      },
+    })
+    .then((response) => {
+      console.log("1.2 getBannerByCompanyId response ", response.data);
+      dispatch(getDocumentByIdReducer(response.data));
+    });
+};
+
 export const createDocumentAction = (documentName, id) => async (dispatch) => {
   const token = localStorage.getItem("token");
   console.log(documentName, id);
@@ -796,6 +820,35 @@ export const createDocumentAction = (documentName, id) => async (dispatch) => {
 
     console.log("Data uploaded successfully:", response.data);
     dispatch(createDocumentReducer(response.data));
+    // Handle success, e.g., dispatch an action to update state
+  } catch (error) {
+    // Handle errors, e.g., by returning an error object or dispatching an error action
+    // console.error("Error uploading data:", error);
+    // You can dispatch an error action here if needed.
+  }
+};
+
+export const updateDocumentContentAction = (id, content) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+
+  const data = { 
+    document_content: content,
+   };
+
+  try {
+    const response = await axios.patch(
+      `${END_POINT}/api/user/project/document/${id}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json", // Set the content type to JSON
+        },
+      }
+    );
+
+    console.log("Data uploaded successfully:", response.data);
+    dispatch(updateDocumentContentReducer(response.data));
     // Handle success, e.g., dispatch an action to update state
   } catch (error) {
     // Handle errors, e.g., by returning an error object or dispatching an error action
