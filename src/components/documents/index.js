@@ -9,6 +9,7 @@ import {
 import jwtDecode from "jwt-decode";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Document from "@/components/document"
 import {
   Box,
   Container,
@@ -22,8 +23,10 @@ import {
 export default function Documents(id) {
   const allProjectDocuments = useSelector((state) => state.auth.allDocuments);
   const [documents, setDocuments] = useState([]);
+  const [isClicked, setIsClicked] = useState(false);
+  const [documentId, setDocumentId] = useState(null);
   const router = useRouter();
-  console.log(id.id);
+  console.log(id);
 
   const dispatch = useDispatch();
 
@@ -36,10 +39,14 @@ export default function Documents(id) {
   }, [allProjectDocuments]);
 
   const handleRedirect = (documentId) => {
+    setIsClicked(true)
+    setDocumentId(documentId)
     console.log(documentId);
     router.push(`/document/${documentId}`);
-  }
-  return (
+  };
+  return isClicked ? (
+    <Document id={documentId}/>
+  ) : (
     <>
       <Container
         className="order__container_mobile"
@@ -68,7 +75,13 @@ export default function Documents(id) {
                       {item.document_name}
                     </TableCell>
                     <TableCell classname="mobile__fs_10">
-                      <button onClick={() => {handleRedirect(item.id)}}>изменить</button>
+                      <button
+                        onClick={() => {
+                          handleRedirect(item.id);
+                        }}
+                      >
+                        изменить
+                      </button>
                     </TableCell>
                   </TableRow>
                 ))}

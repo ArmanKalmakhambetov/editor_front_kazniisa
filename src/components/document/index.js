@@ -134,15 +134,18 @@ const DEFAULT_INITIAL_DATA = {
   ],
 };
 
-export default function Document(id) {
+export default function Document({id}) {
   const [document, setDocument] = useState(null);
   const [content, setContent] = useState(null);
+  const idDoc = id;
   const ejInstance = useRef(null);
   const currentDocument = useSelector((state) => state.auth.currentDocument);
   const dispatch = useDispatch();
 
+  console.log(idDoc, typeof(idDoc))
+
   useEffect(() => {
-    dispatch(getDocumentByIdAction(id.id));
+    dispatch(getDocumentByIdAction(idDoc));
   }, [dispatch]);
 
   useEffect(() => {
@@ -211,7 +214,7 @@ export default function Document(id) {
 
   const handleClick = () => {
     console.log(content);
-    dispatch(updateDocumentContentAction(id.id, content));
+    dispatch(updateDocumentContentAction(id, content));
   };
 
   return (

@@ -769,6 +769,7 @@ export const getAllUserProjectsAction = () => async (dispatch) => {
 
 export const getAllProjectDocumentsAction = (id) => async (dispatch) => {
   const token = localStorage.getItem("token");
+  console.log(id)
   const response = await axios
     .get(`${END_POINT}/api/user/project/${id}/alldocuments`, {
       headers: {
@@ -782,10 +783,10 @@ export const getAllProjectDocumentsAction = (id) => async (dispatch) => {
     });
 };
 
-export const getDocumentByIdAction = (id) => async (dispatch) => {
+export const getDocumentByIdAction = (iddd) => async (dispatch) => {
   const token = localStorage.getItem("token");
   const response = await axios
-    .get(`${END_POINT}/api/user/project/document/${id}`, {
+    .get(`${END_POINT}/api/user/project/document/${iddd}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json", // Set the content type to JSON
