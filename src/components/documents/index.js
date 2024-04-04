@@ -26,12 +26,12 @@ export default function Documents(id) {
   const [isClicked, setIsClicked] = useState(false);
   const [documentId, setDocumentId] = useState(null);
   const router = useRouter();
-  console.log(id);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getAllProjectDocumentsAction(id.id));
+    console.log(allProjectDocuments)
   }, [dispatch]);
 
   useEffect(() => {
@@ -41,8 +41,8 @@ export default function Documents(id) {
   const handleRedirect = (documentId) => {
     setIsClicked(true)
     setDocumentId(documentId)
-    console.log(documentId);
-    router.push(`/document/${documentId}`);
+    
+    // router.push(`/document/${documentId}`);
   };
   return isClicked ? (
     <Document id={documentId}/>

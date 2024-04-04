@@ -21,6 +21,9 @@ const initialState = {
   allProjects: [],
   allDocuments: [],
   currentDocument: {},
+  currentDocId: null,
+  currentProjId: null,
+
 };
 // const token = localStorage.getItem('token');
 
@@ -287,7 +290,17 @@ export const authSlice = createSlice({
     },
     updateDocumentContentReducer: (state, action) => {
       state.currentDocument = [...state.currentDocument, action.payload];
-    }
+    },
+    setCurrentDocIdReducer: (state, action) => {
+      state.currentDocId = action.payload;
+    },
+    setCurrentProjIdReducer: (state, action) => {
+      if (state.currentProjId === action.payload) {
+        state.currentProjId = null
+        return
+      }
+      state.currentProjId = action.payload
+    },
   },
 });
 
@@ -317,6 +330,8 @@ export const {
   createDocumentReducer,
   getDocumentByIdReducer,
   updateDocumentContentReducer,
+  setCurrentDocIdReducer,
+  setCurrentProjIdReducer
 } = authSlice.actions;
 
 // Use useEffect for token initialization

@@ -1,3 +1,23 @@
-.home__box {
+.layout__box {
+    width: 100%;
+    margin: 0 auto;
+    padding: 50px;
     display: flex;
+}
+
+.layout__left {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 300px;
+    height: 80vh;
+    padding: 2rem;
+}
+
+.layout__right {
+    width: 100%;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    
 }

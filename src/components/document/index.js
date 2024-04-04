@@ -142,7 +142,7 @@ export default function Document({id}) {
   const currentDocument = useSelector((state) => state.auth.currentDocument);
   const dispatch = useDispatch();
 
-  console.log(idDoc, typeof(idDoc))
+  
 
   useEffect(() => {
     dispatch(getDocumentByIdAction(idDoc));
@@ -152,8 +152,7 @@ export default function Document({id}) {
     setDocument(currentDocument);
     if (document != null && ejInstance.current === null) {
       initEditor();
-      console.log(document);
-      console.log(currentDocument);
+      
     }
   }, [currentDocument]);
 
