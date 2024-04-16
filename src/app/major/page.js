@@ -9,12 +9,18 @@ import { Modal, Box, TextField, Button, Typography } from "@mui/material";
 import Image from "next/image";
 
 import ProjectRender from "@/components/projectrender";
+import ProjectDetails from "@/components/projectdetails";
 
 export default function page() {
   const allUserProjects = useSelector((state) => state.auth.allProjects);
   const dispatch = useDispatch();
   const [openModal, setOpenModal] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+
+  const handleProjectClick = (projectId) => {
+    setSelectedProjectId(projectId);
+  };
 
   useEffect(() => {
     dispatch(getAllUserProjectsAction());
@@ -48,63 +54,76 @@ export default function page() {
         <div className="col-10">
           <nav className="navbar bg-light mb-4">
             <div className="container-fluid">
-              <a className="navbar-brand" href="#">
-                Навигация
-              </a>
-              <button
-                className="btn btn-outline-success"
-                type="button"
-                onClick={handleOpenModal}
-              >
-                + Project
-              </button>
-              
-              <Modal
-                open={openModal}
-                onClose={handleCloseModal}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: 400,
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
-                  }}
-                >
-                  <Typography
-                    id="modal-modal-title"
-                    variant="h6"
-                    component="h2"
+              {selectedProjectId ? (
+                <div>документ</div>
+              ) : (
+                <>
+                  <a className="navbar-brand" href="#">
+                    Навигация
+                  </a>
+                  <button
+                    className="btn btn-outline-success"
+                    type="button"
+                    onClick={handleOpenModal}
                   >
-                    Новый проект
-                  </Typography>
-                  <TextField
-                    autoFocus
-                    margin="dense"
-                    id="name"
-                    label="Название проекта"
-                    type="text"
-                    fullWidth
-                    variant="standard"
-                    value={newProjectName}
-                    onChange={(e) => setNewProjectName(e.target.value)}
-                  />
-                  <Button onClick={handleCreateProject} color="primary">
-                    Создать
-                  </Button>
-                </Box>
-              </Modal>
+                    + Project
+                  </button>
+
+                  <Modal
+                    open={openModal}
+                    onClose={handleCloseModal}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                  >
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: 400,
+                        bgcolor: "background.paper",
+                        boxShadow: 24,
+                        p: 4,
+                      }}
+                    >
+                      <Typography
+                        id="modal-modal-title"
+                        variant="h6"
+                        component="h2"
+                      >
+                        Новый проект
+                      </Typography>
+                      <TextField
+                        autoFocus
+                        margin="dense"
+                        id="name"
+                        label="Название проекта"
+                        type="text"
+                        fullWidth
+                        variant="standard"
+                        value={newProjectName}
+                        onChange={(e) => setNewProjectName(e.target.value)}
+                      />
+                      <Button onClick={handleCreateProject} color="primary">
+                        Создать
+                      </Button>
+                    </Box>
+                  </Modal>
+                </>
+              )}
             </div>
           </nav>
 
           <div className="row">
-            <ProjectRender allProjects={allUserProjects}/>
+            {selectedProjectId ? (
+              <ProjectDetails projectId={selectedProjectId} />
+            ) : (
+              <ProjectRender
+                allProjects={allUserProjects}
+                onProjectClick={handleProjectClick}
+              />
+            )}
           </div>
         </div>
       </div>

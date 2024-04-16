@@ -283,6 +283,7 @@ export const authSlice = createSlice({
       state.allDocuments = action.payload;
     },
     createDocumentReducer: (state, action) => {
+      console.log(action.payload)
       state.allDocuments = [...state.allDocuments, action.payload]; //нужен для обновления всех документов в реальном времени
     },
     getDocumentByIdReducer: (state, action) => {
@@ -290,6 +291,7 @@ export const authSlice = createSlice({
     },
     updateDocumentContentReducer: (state, action) => {
       state.currentDocument = [...state.currentDocument, action.payload];
+      state.allDocuments = [...state.allDocuments, action.payload];
     },
     setCurrentDocIdReducer: (state, action) => {
       state.currentDocId = action.payload;
@@ -796,6 +798,7 @@ export const getAllProjectDocumentsAction = (id) => async (dispatch) => {
       console.log("1.2 getBannerByCompanyId response ", response.data);
       dispatch(getAllProjectDocumentsReducer(response.data));
     });
+    
 };
 
 export const getDocumentByIdAction = (iddd) => async (dispatch) => {
@@ -813,18 +816,20 @@ export const getDocumentByIdAction = (iddd) => async (dispatch) => {
     });
 };
 
-export const createDocumentAction = (documentName, id) => async (dispatch) => {
+export const createDocumentAction = (request) => async (dispatch) => {
   const token = localStorage.getItem("token");
-  console.log(documentName, id);
+
+  console.log(request)
+  
 
   const data = { 
-    document_name: documentName,
+    document_name: request.documentName,
     document_content: {},
    };
 
   try {
     const response = await axios.post(
-      `${END_POINT}/api/user/project/${id.id}/createdocument`,
+      `${END_POINT}/api/user/project/${request.projectId}/createdocument`,
       data,
       {
         headers: {

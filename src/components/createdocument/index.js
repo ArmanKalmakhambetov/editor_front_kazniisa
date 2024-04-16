@@ -2,6 +2,7 @@ import React from "react";
 import {
   TextField,
   Container,
+  Box,
   Button,
   Typography,
   Grid,
@@ -9,7 +10,7 @@ import {
   Stack,
   FormControl,
   Select,
-  MenuItem
+  MenuItem,
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
@@ -33,125 +34,91 @@ import {
   Label,
   Input,
   FormGroup,
-  
 } from "reactstrap";
-import { addProjectAction, createDocumentAction } from "@/store/slices/authSlice";
+import {
+  addProjectAction,
+  createDocumentAction,
+} from "@/store/slices/authSlice";
 import { useRouter } from "next/navigation";
 
-
-
-export default function CreateDocument(id) {
+// CreateDocument Component
+export default function CreateDocument({ projectId, handleClose }) {
   const dispatch = useDispatch();
-  const router = useRouter();
-
   const [documentName, setDocumentName] = useState("");
-  const [success, setSuccess] = useState(false);
-
+  const [documentType, setDocumentType] = useState("");
   const [error, setError] = useState("");
 
-  const [serverError, setServerError] = useState("");
-  const errorFromSlice = useSelector((state) => state.auth.error);
-  const [selectedViewOfAd, setSelectedViewOfAd] = useState('');
+  const documentTypes = [
+    { id: "empty", name: "Пустой документ" },
+    { id: "bep", name: "BEP" },
+    // Add more document types here
+  ];
 
-  const viewOfAd = [
-    {id: 1, nameOfView: 'Пустой документ'},
-    {id: 2, nameOfView: 'BEP'},
-  ]
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent the default form submit action
 
-  const handleTypeChangeSelectedViewOfAd = (event) => {
-    setSelectedViewOfAd(event.target.value);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    switch (name) {
-      case "documentName":
-        setDocumentName(value);
-        break;
-    }
-  };
-
-  const handleSubmit = async () => {
-
-    if (selectedViewOfAd === "Пустой документ") {
-        await dispatch(createDocumentAction(documentName, id))
-    }
-    // Проверка наличия всех обязательных полей перед отправкой
-
+    // Basic validation
     if (!documentName) {
-      setError("Пожалуйста, заполните обязательное поле.");
+      setError("Введите название документа");
+      return;
+    }
+    if (!documentType) {
+      setError("Выберите тип документа");
       return;
     }
 
-    // Сброс ошибки и отправка данных
-    setServerError("");
-    console.log("serverErrpr after handleSubmit", serverError);
+    // Dispatch the action to create the document
+    // The createDocumentAction should be adapted to handle the document type as well
+
+    console.log(projectId, documentName, documentType);
+    await dispatch(
+      
+      createDocumentAction({ projectId, documentName, documentType })
+    );
+
+    // Clear the form
+    setDocumentName("");
+    setDocumentType("");
     setError("");
-    // await dispatch(createDocumentAction({documentName, id}));
-    setSuccess(true);
+
+    // Close the modal
+    handleClose();
   };
 
   return (
-    <div className="flexColumn">
-      <Row
-        style={{
-          height: "98vh",
-          alignItems: "center",
-          width: "100vw",
-        }}
-      >
-        <Col className="" sm="4" xs="6"></Col>
-        <Col sm="4" xs="6">
-          <Row className="card">
-            <Col>
-              <form action="" method="POST">
-                <Input
-                  label="Document name"
-                  name="documentName"
-                  type="text"
-                  value={documentName}
-                  onChange={handleChange}
-                  placeholder="Введите название документа"
-                />
-
-                {error && <Typography color="error">{error}</Typography>}
-                {serverError && <p>{serverError}</p>}
-                {success && (
-                  <Typography color="primary">
-                    Данные успешно отправлены.
-                  </Typography>
-                )}
-                <br />
-
-                <FormControl>
-                  {/* <InputLabel id="typeOfView-label">Select viewOfAd</InputLabel> */}
-                  <Select
-                    labelId="typeOfView-label"
-                    id="typeOfView"
-                    value={selectedViewOfAd}
-                    label="Select View"
-                    onChange={handleTypeChangeSelectedViewOfAd}
-                  >
-                    {viewOfAd.map((item) => (
-                      <MenuItem key={item.id} value={item.nameOfView}>
-                        {item.nameOfView}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSubmit}
-                >
-                  Создать
-                </Button>
-              </form>
-            </Col>
-          </Row>
-        </Col>
-        <Col className="" sm="4"></Col>
-      </Row>
-    </div>
+    <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        id="documentName"
+        label="Название документа"
+        name="documentName"
+        value={documentName}
+        onChange={(e) => setDocumentName(e.target.value)}
+        autoFocus
+      />
+      <FormControl fullWidth margin="normal">
+        <Select
+          value={documentType}
+          onChange={(e) => setDocumentType(e.target.value)}
+          displayEmpty
+          inputProps={{ "aria-label": "Without label" }}
+        >
+          <MenuItem disabled value="">
+            <em>Выберите тип документа</em>
+          </MenuItem>
+          {documentTypes.map((type) => (
+            <MenuItem key={type.id} value={type.id}>
+              {type.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      {error && <Typography color="error">{error}</Typography>}
+      <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+        Создать
+      </Button>
+    </Box>
   );
 }

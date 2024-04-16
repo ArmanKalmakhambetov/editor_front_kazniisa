@@ -71,7 +71,7 @@ export default function Login() {
       console.log("IM IN LOGIN HANDLE CODE SUBBMIT");
       dispatch(verifyCodeAction(email, lastFour));
 
-      router.push("/projects");
+      router.push("/major");
     } else {
       setIsWrongCode(true);
       setInputEnabled(false);
