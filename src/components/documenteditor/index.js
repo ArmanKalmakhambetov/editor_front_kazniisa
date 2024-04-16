@@ -13,6 +13,7 @@ import Quote from "@editorjs/quote";
 import Table from "@editorjs/table";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  deleteDocumentAction,
   getDocumentByIdAction,
   updateDocumentContentAction,
 } from "@/store/slices/authSlice";
@@ -20,7 +21,7 @@ import {
 export default function DocumentEditor({ document }) {
   const [doc, setDoc] = useState(null);
   const [content, setContent] = useState(null);
-  console.log(document)
+  console.log(document);
   const idDoc = document.id;
   const ejInstance = useRef(null);
   const currentDocument = useSelector((state) => state.auth.currentDocument);
@@ -34,10 +35,8 @@ export default function DocumentEditor({ document }) {
     setDoc(currentDocument);
     if (doc != null && ejInstance.current === null) {
       initEditor();
-      
     }
   }, [currentDocument]);
-
 
   const initEditor = () => {
     const editor = new EditorJS({
@@ -94,6 +93,10 @@ export default function DocumentEditor({ document }) {
     ejInstance.current = editor;
   };
 
+  const deleteClick = () => {
+    dispatch(deleteDocumentAction(currentDocument.id))
+  }
+
   const handleClick = () => {
     console.log(content);
     dispatch(updateDocumentContentAction(currentDocument.id, content));
@@ -102,7 +105,12 @@ export default function DocumentEditor({ document }) {
   return (
     <>
       <div id="editorjs"></div>
-      <button onClick={handleClick}>Save</button>
+      <div className="d-flex gap-5">
+        <button className="btn btn-outline-success" onClick={handleClick}>
+          Сохранить
+        </button>
+        <button className="btn btn-outline-danger" onClick={deleteClick}>Удалить</button>
+      </div>
     </>
   );
 }

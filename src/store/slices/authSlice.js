@@ -274,7 +274,6 @@ export const authSlice = createSlice({
     },
     addProjectReducer: (state, action) => {
       state.allProjects = [...state.allProjects, action.payload];
-      
     },
     getAllUserProjectsReducer: (state, action) => {
       state.allProjects = action.payload;
@@ -302,6 +301,9 @@ export const authSlice = createSlice({
         return
       }
       state.currentProjId = action.payload
+    },
+    DeleteDocumentReducer: (state, action) => {
+      state.allDocuments = state.allDocuments.filter(document => document.id !== action.payload); //нужен для обновления всех документов в реальном времени
     },
   },
 });
@@ -333,7 +335,9 @@ export const {
   getDocumentByIdReducer,
   updateDocumentContentReducer,
   setCurrentDocIdReducer,
-  setCurrentProjIdReducer
+  setCurrentProjIdReducer,
+  DeleteDocumentReducer,
+
 } = authSlice.actions;
 
 // Use useEffect for token initialization
@@ -877,6 +881,32 @@ export const updateDocumentContentAction = (id, content) => async (dispatch) => 
     // You can dispatch an error action here if needed.
   }
 };
+
+export const deleteDocumentAction = (id) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.delete(
+      `${END_POINT}/api/user/project/document/${id}`,
+      
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json", // Set the content type to JSON
+        },
+      }
+    );
+
+    console.log("Data deleted successfully:");
+    dispatch(DeleteDocumentReducer(id))
+    
+    // Handle success, e.g., dispatch an action to update state
+  } catch (error) {
+    // Handle errors, e.g., by returning an error object or dispatching an error action
+    // console.error("Error uploading data:", error);
+    // You can dispatch an error action here if needed.
+  }
+}
 
 export const addCompanyAction =
   (name, description, bin, address, contactEmail, contactPhone, isUR) =>

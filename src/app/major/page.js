@@ -6,17 +6,23 @@ import {
   addProjectAction,
 } from "@/store/slices/authSlice";
 import { Modal, Box, TextField, Button, Typography } from "@mui/material";
+import leftArrow from "@/../../public/icons/arrow-left-solid.svg";
 import Image from "next/image";
 
 import ProjectRender from "@/components/projectrender";
 import ProjectDetails from "@/components/projectdetails";
+import jwt_decode from "jwt-decode";
 
 export default function page() {
   const allUserProjects = useSelector((state) => state.auth.allProjects);
+  const currentUser = useSelector((state) => state.auth.currentUser);
   const dispatch = useDispatch();
   const [openModal, setOpenModal] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
   const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const decoded = jwt_decode(localStorage.getItem("token"));
+
+  console.log(decoded);
 
   const handleProjectClick = (projectId) => {
     setSelectedProjectId(projectId);
@@ -44,18 +50,36 @@ export default function page() {
     handleCloseModal();
   };
 
+  const handleBackClick = () => {
+    setSelectedProjectId(null);
+  };
+
   return (
     <>
       <div className="row">
         <div className="col-2 d-flex flex-column align-items-center justify-content-between bg-light min-vh-100">
           <div className="justify-content-start p-5">Рабочее пространство</div>
-          <div className="justify-content-end p-5">Konstantin</div>
+          <div className="justify-content-end p-5">{decoded.email}</div>
         </div>
         <div className="col-10">
           <nav className="navbar bg-light mb-4">
             <div className="container-fluid">
               {selectedProjectId ? (
-                <div>документ</div>
+                <div className="d-flex gap-3">
+                  <button
+                    onClick={() => handleBackClick()}
+                    className="btn btn-outline-warning"
+                  >
+                    <Image
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                      }}
+                      src={leftArrow}
+                    />
+                  </button>
+                  <div className="d-flex align-items-center">документ</div>
+                </div>
               ) : (
                 <>
                   <a className="navbar-brand" href="#">
@@ -66,7 +90,7 @@ export default function page() {
                     type="button"
                     onClick={handleOpenModal}
                   >
-                    + Project
+                    + Создать Проект
                   </button>
 
                   <Modal

@@ -18,9 +18,10 @@ export default function ProjectDetails({ projectId }) {
   const allProjectDocuments = useSelector((state) => state.auth.allDocuments);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [openCreateModal, setOpenCreateModal] = useState(false);
+  const [selectedDocumentId, setSelectedDocumentId] = useState(null);
   const dispatch = useDispatch();
 
-  console.log(allProjectDocuments)
+  console.log(allProjectDocuments);
 
   useEffect(() => {
     dispatch(getAllProjectDocumentsAction(projectId));
@@ -40,7 +41,13 @@ export default function ProjectDetails({ projectId }) {
     setOpenCreateModal(false);
   };
 
-  console.log('1/1/1/1',selectedDocument)
+  console.log("1/1/1/1", selectedDocument);
+
+  const handleDocumentClick = (document) => {
+    // Переключаем активное состояние на выбранный документ
+    setSelectedDocument(document);
+    setSelectedDocumentId(document.id);
+  };
 
   return (
     <div>
@@ -54,8 +61,16 @@ export default function ProjectDetails({ projectId }) {
           +
         </button>
         {allProjectDocuments.map((document, index) => (
-          <div key={index} onClick={() => setSelectedDocument(document)}>
-            {document.document_name}
+          <div>
+            <button
+              key={document.id} // Лучше использовать уникальный id, если он доступен
+              onClick={() => handleDocumentClick(document)}
+              className={`btn btn-outline-success ${
+                selectedDocumentId === document.id ? "active" : ""
+              }`}
+            >
+              {document.document_name}
+            </button>
           </div>
         ))}
       </div>
@@ -64,7 +79,14 @@ export default function ProjectDetails({ projectId }) {
       {selectedDocument ? (
         <DocumentEditor key={selectedDocument.id} document={selectedDocument} />
       ) : (
-        <h1>Документов нет, нажмите на кнопку + чтобы создать документ</h1>
+        <div
+          style={{
+            height: "70vh",
+          }}
+          className="d-flex align-items-center justify-content-center"
+        >
+          Документов нет, нажмите на кнопку + чтобы создать документ
+        </div>
       )}
 
       {/* Create Document Modal */}
