@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getAllUserProjectsAction,
   addProjectAction,
+  getAllAdminTemplateAction,
 } from "@/store/slices/authSlice";
 import { Modal, Box, TextField, Button, Typography } from "@mui/material";
 import leftArrow from "@/../../public/icons/arrow-left-solid.svg";
@@ -30,9 +31,11 @@ export default function page() {
 
   useEffect(() => {
     dispatch(getAllUserProjectsAction());
+    
   }, [dispatch]);
 
   const handleOpenModal = () => {
+    
     setOpenModal(true);
   };
 
@@ -58,7 +61,7 @@ export default function page() {
     <>
       <div className="row">
         <div className="col-2 d-flex flex-column align-items-center justify-content-between bg-light min-vh-100">
-          <div className="justify-content-start p-5">Рабочее пространство</div>
+          <h3 className="justify-content-start p-5">KazNIISA Editor v.0.1</h3>
           <div className="justify-content-end p-5">{decoded.email}</div>
         </div>
         <div className="col-10">
@@ -82,9 +85,7 @@ export default function page() {
                 </div>
               ) : (
                 <>
-                  <a className="navbar-brand" href="#">
-                    Навигация
-                  </a>
+                  
                   <button
                     className="btn btn-outline-success"
                     type="button"

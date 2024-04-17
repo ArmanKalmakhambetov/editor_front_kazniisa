@@ -38,6 +38,8 @@ import {
 import {
   addProjectAction,
   createDocumentAction,
+  createDocumentByTemplateAction,
+  getAllAdminTemplateAction,
 } from "@/store/slices/authSlice";
 import { useRouter } from "next/navigation";
 
@@ -47,12 +49,23 @@ export default function CreateDocument({ projectId, handleClose }) {
   const [documentName, setDocumentName] = useState("");
   const [documentType, setDocumentType] = useState("");
   const [error, setError] = useState("");
+  const allTemplates = useSelector((state) => state.auth.allTemplates);
+  const docs = []
 
-  const documentTypes = [
-    { id: "empty", name: "Пустой документ" },
-    { id: "bep", name: "BEP" },
-    // Add more document types here
-  ];
+  docs.push({id: '0', document_name: 'Пустой документ'})
+
+  if(allTemplates) {
+    docs.push(...allTemplates)
+  }
+
+  console.log( "DOCS ====", docs)
+
+  useEffect(() => {
+    dispatch(getAllAdminTemplateAction());
+    
+  }, [dispatch]);
+
+ 
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent the default form submit action
@@ -70,11 +83,20 @@ export default function CreateDocument({ projectId, handleClose }) {
     // Dispatch the action to create the document
     // The createDocumentAction should be adapted to handle the document type as well
 
-    console.log(projectId, documentName, documentType);
-    await dispatch(
+    if (documentType == 0) {
       
-      createDocumentAction({ projectId, documentName, documentType })
-    );
+      dispatch(createDocumentAction({ projectId, documentName }));
+    } else {
+      // Если выбран другой тип документа, отправляем запрос на создание документа по шаблону
+      console.log(projectId, documentName, documentType);
+      dispatch(
+        createDocumentByTemplateAction({
+          projectId,
+          documentName,
+          documentType,
+        })
+      );
+    }
 
     // Clear the form
     setDocumentName("");
@@ -108,9 +130,9 @@ export default function CreateDocument({ projectId, handleClose }) {
           <MenuItem disabled value="">
             <em>Выберите тип документа</em>
           </MenuItem>
-          {documentTypes.map((type) => (
+          {docs.map((type) => (
             <MenuItem key={type.id} value={type.id}>
-              {type.name}
+              {type.document_name}
             </MenuItem>
           ))}
         </Select>

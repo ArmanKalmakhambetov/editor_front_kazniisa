@@ -134,6 +134,7 @@ const DEFAULT_INITIAL_DATA = {
   ],
 };
 
+
 export default function Document({id}) {
   const [document, setDocument] = useState(null);
   const [content, setContent] = useState(null);

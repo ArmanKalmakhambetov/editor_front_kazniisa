@@ -23,6 +23,7 @@ const initialState = {
   currentDocument: {},
   currentDocId: null,
   currentProjId: null,
+  allTemplates: [],
 
 };
 // const token = localStorage.getItem('token');
@@ -278,6 +279,9 @@ export const authSlice = createSlice({
     getAllUserProjectsReducer: (state, action) => {
       state.allProjects = action.payload;
     },
+    getAllAdminTemplateReducer: (state, action) => {
+      state.allTemplates = action.payload;
+    },
     getAllProjectDocumentsReducer: (state, action) => {
       state.allDocuments = action.payload;
     },
@@ -337,6 +341,7 @@ export const {
   setCurrentDocIdReducer,
   setCurrentProjIdReducer,
   DeleteDocumentReducer,
+  getAllAdminTemplateReducer,
 
 } = authSlice.actions;
 
@@ -805,6 +810,25 @@ export const getAllProjectDocumentsAction = (id) => async (dispatch) => {
     
 };
 
+export const getAllAdminTemplateAction = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+
+  console.log("ADMIN")
+  
+  const response = await axios
+    .get(`${END_POINT}/api/alltemplates`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json", // Set the content type to JSON
+      },
+    })
+    .then((response) => {
+      console.log("Admin Templates ", response.data);
+      dispatch(getAllAdminTemplateReducer(response.data));
+    });
+    
+};
+
 export const getDocumentByIdAction = (iddd) => async (dispatch) => {
   const token = localStorage.getItem("token");
   const response = await axios
@@ -906,7 +930,42 @@ export const deleteDocumentAction = (id) => async (dispatch) => {
     // console.error("Error uploading data:", error);
     // You can dispatch an error action here if needed.
   }
-}
+};
+
+
+
+
+
+export const createDocumentByTemplateAction = (request) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+
+  console.log(`${END_POINT}/api/user/project/${request.projectId}/createdocument/${request.documentType}`)
+
+  const data = { 
+    document_name: request.documentName,
+   };
+
+  try {
+    const response = await axios.post(
+      `${END_POINT}/api/user/project/${request.projectId}/createdocument/${request.documentType}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json", // Set the content type to JSON
+        },
+      }
+    );
+
+    console.log("Data uploaded successfully:", response.data);
+    dispatch(createDocumentReducer(response.data));
+    // Handle success, e.g., dispatch an action to update state
+  } catch (error) {
+    // Handle errors, e.g., by returning an error object or dispatching an error action
+    // console.error("Error uploading data:", error);
+    // You can dispatch an error action here if needed.
+  }
+};
 
 export const addCompanyAction =
   (name, description, bin, address, contactEmail, contactPhone, isUR) =>
